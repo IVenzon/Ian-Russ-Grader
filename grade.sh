@@ -1,6 +1,10 @@
 # CPATH='.:lib/hamcrest-core-1.3.jar:lib/junit-4.13.2.jar' # uncomment this line and comment the line below if on Mac
 CPATH=".;lib/hamcrest-core-1.3.jar;lib/junit-4.13.2.jar"
 
+#--------------------------------------------------
+# PART 1: CLONING AND CHECKING FOR CORRECT FILES
+#--------------------------------------------------
+
 rm -rf student-submission
 git clone $1 student-submission
 echo 'Finished cloning'
@@ -15,6 +19,10 @@ else
     exit
 fi
 
+#--------------------------------------------------
+# PART 2: SETTING UP FILES FOR TESTING
+#--------------------------------------------------
+
 cp ListExamples.java ..
 cd ..
 
@@ -28,12 +36,15 @@ cp -r lib testing-folder
 
 echo 'Files ready for testing'
 
+#--------------------------------------------------
+# PART 3: COMPILING STUDENT SUBMISSION
+#--------------------------------------------------
+
+rm -rf compile-result.txt
+
 javac -cp $CPATH ./testing-folder/*.java 2> compile-result.txt
 
 X=$?
-
-echo $X
-
 
 if [[ $X -eq 0 ]]
 then
@@ -44,8 +55,13 @@ else
     exit
 fi
 
+#--------------------------------------------------
+# PART 4: RUNNING STUDENT SUBMISSION
+#--------------------------------------------------
 
 cd testing-folder
+
+rm -rf compile-result.txt
 
 # java -cp $CPATH org.junit.runner.JUnitCore ./testing-folder/TestListExamples > run-result.txt
 java -cp ".;lib/junit-4.13.2.jar;lib/hamcrest-core-1.3.jar" org.junit.runner.JUnitCore TestListExamples > run-result.txt
@@ -65,16 +81,20 @@ else
     exit
 fi
 
+#--------------------------------------------------
+# PART 5: GRADING STUDENT SUBMISSION
+#--------------------------------------------------
+
 rm -rf failures.txt 
 
 grep -c -i "FAILURES" run-result.txt > failures.txt
 
 
-fails=`grep -c -i "FAILURES" run-result.txt`
+FAILS=`grep -c -i "FAILURES" run-result.txt`
 
 echo "-----"
 
-if [[ $fails -eq 0 ]]
+if [[ $FAILS -eq 0 ]]
 then
     echo "You passed!"
 else
